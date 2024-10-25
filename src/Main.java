@@ -25,44 +25,43 @@ public class Main {
     }
 
     private static Document getSystem() throws IOException {
-        var sources = Jsoup.connect(ROOT).get().select("td.link > a[href]");
-
-        List<String> sourcesTitles = sources.stream()
+        var url = ROOT;
+        var sources = Jsoup.connect(url).get().select("td.link > a[href]");
+        Map<String, String> titles = sources.stream()
                 .skip(1)
-                .map(element -> element.getElementsByAttribute("title").getFirst().attr("title"))
-                .toList();
-        List<String> sourcesLinks = sources.stream()
+                .collect(Collectors.toMap(element -> element.getElementsByAttribute("title").getFirst().attr("title"),
+                                          element -> element.getElementsByAttribute("href").getFirst().attr("href")));
+        JList<String> list = new JList<>(titles.keySet().stream().sorted().toList().toArray(new String[0]));
+        String selectedSource = requestSelection(list, "Pick ur source");
+        url += titles.get(selectedSource);
+
+
+        sources = Jsoup.connect(url).get().select("td.link > a[href]");
+        titles = sources.stream()
                 .skip(1)
-                .map(element -> element.getElementsByAttribute("href").getFirst().attr("href"))
-                .toList();
+                .collect(Collectors.toMap(element -> element.getElementsByAttribute("title").getFirst().attr("title"),
+                                          element -> element.getElementsByAttribute("href").getFirst().attr("href")));
+        list = new JList<>(titles.keySet().stream().sorted().toList().toArray(new String[0]));
+        selectedSource = requestSelection(list, "Pick ur system");
+        url += titles.get(selectedSource);
 
-        var selection = JOptionPane.showOptionDialog(null, "Pick ur source", "Source", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-                sourcesTitles.toArray(), sourcesTitles.getFirst());
 
-        sources = Jsoup.connect(ROOT + sourcesLinks.get(selection)).get().select("td.link > a[href]");
+        sources = Jsoup.connect(url).get().select("td.link > a[href]");
 
-        sourcesTitles = sources.stream()
-                .skip(1)
-                .map(element -> element.getElementsByAttribute("title").getFirst().attr("title"))
-                .toList();
-        sourcesLinks = sources.stream()
-                .skip(1)
-                .map(element -> element.getElementsByAttribute("href").getFirst().attr("href"))
-                .toList();
 
-        JList<String> list = new JList<>(sourcesTitles.toArray(new String[0]));
+        return null;
+    }
+
+    private static String requestSelection(JList<String> list, String message) {
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scrollPane = new JScrollPane(list);
         scrollPane.setPreferredSize(new java.awt.Dimension(600, 400));
 
-        selection = JOptionPane.showOptionDialog(null, scrollPane, "Pick ur system", JOptionPane.OK_CANCEL_OPTION,
+        JOptionPane.showOptionDialog(null, scrollPane, message, JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE, null, null, null);
+        //var selection = list.getSelectedIndex();
 
-        if (selection == JOptionPane.OK_OPTION) {
-            String selectedSource = list.getSelectedValue();
-            System.out.println("Selected source: " + selectedSource);
-        }
-        return null;
+        return list.getSelectedValue();
     }
 
     private static Elements findDLURLs(String baseURL) throws IOException {
