@@ -1,7 +1,5 @@
 public enum Version {
-    Latest,
-    Demo,
-    Proto,
-    Sample,
+    Default,
+    Rev,
     Beta
 }

@@ -32,7 +32,7 @@ public class Main {
                 .collect(Collectors.toMap(element -> element.getElementsByAttribute("title").getFirst().attr("title"),
                                           element -> element.getElementsByAttribute("href").getFirst().attr("href")));
         JList<String> list = new JList<>(titles.keySet().stream().sorted().toList().toArray(new String[0]));
-        String selectedSource = requestSelection(list, "Pick ur source");
+        String selectedSource = requestSelection(list, "Pick your source");
         url += titles.get(selectedSource);
 
 
@@ -42,7 +42,7 @@ public class Main {
                 .collect(Collectors.toMap(element -> element.getElementsByAttribute("title").getFirst().attr("title"),
                                           element -> element.getElementsByAttribute("href").getFirst().attr("href")));
         list = new JList<>(titles.keySet().stream().sorted().toList().toArray(new String[0]));
-        selectedSource = requestSelection(list, "Pick ur system");
+        selectedSource = requestSelection(list, "Pick your system");
         url += titles.get(selectedSource);
 
 
